@@ -1,0 +1,6 @@
+^.*\.Rproj$
+^\.Rproj\.user$
+^dev/
+^fulldata/
+^data-raw$
+^README\.Rmd$
