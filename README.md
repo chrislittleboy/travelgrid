@@ -9,7 +9,7 @@
 
 <!-- badges: end -->
 
-The goal of travelgrid is to Measures the time taken to travel somewhere
+The goal of travelgrid is to measure the time taken to travel somewhere
 through a landscape. It is fast, scalable, and is built to handle
 many-to-many least-cost travel time computation where the built
 environment and topography matter.
