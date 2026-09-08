@@ -24,9 +24,13 @@ remotes::install_github("chrislittleboy/travelgrid")
 
 ## Input data
 
-Here, we load road and building footprint data for Edinburgh, downloaded
-directly from Open Street Maps. We also require a Digital Elevation
-Model, which can be downloaded using the *elevatr* package.
+Users can download and use data from anywhere in the world. Throughout
+this explainer we illustrate the method with data specific to Edinburgh
+in Scotland.
+
+Road and building footprint data for Edinburgh downloaded directly from
+Open Street Maps. We also require a Digital Elevation Model, which can
+be downloaded using the *elevatr* package.
 
 ``` r
 library(travelgrid)

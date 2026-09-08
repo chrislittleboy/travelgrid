@@ -20,7 +20,7 @@ knitr::opts_chunk$set(
 <!-- badges: start -->
 <!-- badges: end -->
 
-The goal of travelgrid is to Measures the time taken to travel somewhere through a landscape.
+The goal of travelgrid is to measure the time taken to travel somewhere through a landscape.
 It is fast, scalable, and is built to handle many-to-many least-cost travel time computation where the built environment and topography matter.
 
 ## Installation
@@ -33,7 +33,10 @@ remotes::install_github("chrislittleboy/travelgrid")
 
 ## Input data
 
-Here, we load road and building footprint data for Edinburgh, downloaded directly from Open Street Maps.
+Users can download and use data from anywhere in the world.
+Throughout this explainer we illustrate the method with data specific to Edinburgh in Scotland. 
+
+Road and building footprint data for Edinburgh downloaded directly from Open Street Maps.
 We also require a Digital Elevation Model, which can be downloaded using the *elevatr* package.
 
 ```{r sourcedata}
