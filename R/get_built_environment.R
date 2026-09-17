@@ -21,6 +21,10 @@
 #' @export
 
 get_built_environment <- function(buildings, roads, template, road_travel = 1, non_road_travel = 1){
+  if(crs(buildings) != crs(template)){
+    buildings <- project(buildings, template)}
+  if(crs(roads) != crs(template)){
+    roads <- project(roads, template)}
   br <- rasterize(buildings,template, field = 0, background = -1, touches = TRUE) # gets building data as a raster
   rr <- rasterize(roads,template, field = -1, background = 0, touches = TRUE) # gets road and path data as a raster
   brr <- br + rr # gets building and road data together

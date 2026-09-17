@@ -15,7 +15,7 @@ friction_grid <- lapply(FUN = get_friction,
                         built_environment = built_environment,
                         dem = dem)
 
-friction <- merge(sprc(friction_grid))
+friction <- trim(merge(sprc(friction_grid)))
 
 mm <- as.numeric(minmax(friction))
 

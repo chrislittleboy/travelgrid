@@ -1,7 +1,13 @@
-roads <- retrieve_roads()
-buildings <- retrieve_buildings()
-edinburgh <- retrieve_edinburgh()
-template <- rast(edinburgh, res=100)
+roads <- retrieve_roads() |> project("epsg:3857")
+buildings <- retrieve_buildings() |> project("epsg:3857")
+aoi <- terra::convHull(
+  rbind(
+    terra::vect(terra::geom(roads)),
+    terra::vect(terra::geom(buildings))
+  )
+) |>
+  st_as_sf()
+template <- rast(aoi, res=10, crs = crs(roads))
 
 built_environment <- get_built_environment(buildings, roads, template, non_road_travel = 1)
 built_environment_f <- get_built_environment(buildings, roads, template, non_road_travel = 2)

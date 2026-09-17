@@ -2,7 +2,9 @@
 % Please edit documentation in R/retrieve_dem.R
 \name{retrieve_dem}
 \alias{retrieve_dem}
-\title{Retrieves AWS DEM data for Edinburgh}
+\title{Retrieves AWS DEM data for Edinburgh.
+Raw elevation values were divided by 2
+and stored as integers between 0 and 255 to minimize filesize.}
 \usage{
 retrieve_dem()
 }
@@ -10,5 +12,7 @@ retrieve_dem()
 A \code{\link[terra:SpatRaster]{terra::SpatRaster}}.
 }
 \description{
-Retrieves AWS DEM data for Edinburgh
+Retrieves AWS DEM data for Edinburgh.
+Raw elevation values were divided by 2
+and stored as integers between 0 and 255 to minimize filesize.
 }

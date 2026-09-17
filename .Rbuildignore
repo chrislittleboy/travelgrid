@@ -4,3 +4,5 @@
 ^fulldata/
 ^data-raw$
 ^README\.Rmd$
+^cran-comments\.md$
+^README-cache/

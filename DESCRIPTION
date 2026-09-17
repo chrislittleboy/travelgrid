@@ -4,10 +4,15 @@ Title: Measures the travel time across a landscape
 Version: 0.0.1
 Date: 2026-09-01
 Authors@R: person("Chris", "Littleboy", role = c("aut", "cre"), email = "chris.littleboy@stir.ac.uk")
-Description: Calculates travel time across a landscape.A travel-time grid is produced using information about topography, the built environment, and "target" features. This allows for many to many, many to one, one to many travel time calculations. We illustrate the method with the example of measuring the proximity to green and blue spaces in Scotland. This is an important public policy issue, particularly urban planning and health.
+Description: Calculates travel time across a landscape using information about
+    topography, the built environment, and target features. This allows many-to-many,
+    many-to-one, and one-to-many travel-time calculations. The method is illustrated
+    by measuring proximity to green and blue spaces in Scotland, an important issue
+    for public policy, particularly urban planning and health.
 License: GPL (>= 2)
 Imports: 
     elevatr,
+    osmextract,
     sf,
     terra
 LinkingTo: Rcpp
@@ -17,6 +22,7 @@ Depends:
     R (>= 3.5)
 Suggests: 
     progress,
-    testthat (>= 3.0.0)
+    testthat (>= 3.0.0),
+    tibble
 Config/testthat/edition: 3
 Roxygen: list(markdown = TRUE)

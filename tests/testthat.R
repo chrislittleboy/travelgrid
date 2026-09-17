@@ -9,5 +9,7 @@
 library(testthat)
 library(travelgrid)
 library(terra)
+library(sf)
+library(osmextract)
 
 test_check("travelgrid")

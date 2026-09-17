@@ -1,10 +1,9 @@
 # code to prepare bluespace raw data goes here
 # data is from SEPA, and is released under an open government license
 
-bluespace_sources <- list.files("./fulldata/bluespace", full.names = TRUE)
+bluespace_sources <- list.files("/home/chris/Documents/software/travelgrid/fulldata/bluespace", full.names = TRUE)
 bluespace_sources <- bluespace_sources[which(tools::file_ext(bluespace_sources) == "gdb")]
-template <- retrieve_edinburgh()
-
+template <- retrieve_dem()
 sapply(bluespace_sources, function(x){
   bs <- vect(x)
   bs <- crop(bs, template)

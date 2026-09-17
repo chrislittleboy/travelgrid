@@ -12,7 +12,13 @@
 The goal of travelgrid is to measure the time taken to travel somewhere
 through a landscape. It is fast, scalable, and is built to handle
 many-to-many least-cost travel time computation where the built
-environment and topography matter.
+environment and topography matter. The functions in the package allow
+for extracting the necessary input data: elevation maps, building
+footprints, and road networks, from open public data sources. These can
+be combined with any shapefile containing “destinations”. This might,
+for example, be hospitals or other medical practices if you are
+assessing the proximity of public health infrastructure. Or schools, for
+determining school catchment areas within cities.
 
 ## Installation
 
@@ -36,16 +42,68 @@ be downloaded using the *elevatr* package.
 library(travelgrid)
 library(terra)
 #> terra 1.9.46
-buildings <- retrieve_buildings()
-roads <- retrieve_roads()
-dem <- retrieve_dem()
 edinburgh <- retrieve_edinburgh()
-plot(roads)
-plot(dem, add = TRUE, alpha = 0.9)
-plot(edinburgh, add = TRUE, col = NA, border = "red")
+template <- rast(edinburgh, res = 15)
+dem <- get_dem(edinburgh, template)
+#> Mosaicing & Projecting
+#> Note: Elevation units are in meters.
+osm <- get_osm(system.file("extdata", "edinburgh.shp", package = "travelgrid"))
+#> The input place was matched with Scotland.
+#> The chosen file was already detected in the download directory. Skip downloading.
+#> Starting with the vectortranslate operations on the input file!
+#> 0...10...20...30...40...50...60...70...80...90...100 - done.
+#> Warning in CPL_gdalvectortranslate(source, destination, options, oo, doo, :
+#> GDAL Message 1: Non closed ring detected. To avoid accepting it, set the
+#> OGR_GEOMETRY_ACCEPT_UNCLOSED_RING configuration option to NO
+#> Warning in CPL_gdalvectortranslate(source, destination, options, oo, doo, :
+#> GDAL Message 1: Non closed ring detected. To avoid accepting it, set the
+#> OGR_GEOMETRY_ACCEPT_UNCLOSED_RING configuration option to NO
+#> Finished the vectortranslate operations on the input file!
+#> Reading query `SELECT * FROM multipolygons WHERE building IS NOT NULL'
+#> from data source `/home/chris/.local/share/R/osmextract/geofabrik_scotland-latest.gpkg' 
+#>   using driver `GPKG'
+#> Simple feature collection with 186852 features and 25 fields
+#> Geometry type: MULTIPOLYGON
+#> Dimension:     XY
+#> Bounding box:  xmin: -3.451079 ymin: 55.81914 xmax: -3.074061 ymax: 56.01379
+#> Geodetic CRS:  WGS 84
+#> Starting with the vectortranslate operations on the input file!
+#> 0...10...20...30...40...50...60...70...80...90...100 - done.
+#> Finished the vectortranslate operations on the input file!
+#> Reading query `
+#>     SELECT *
+#>     FROM lines
+#>     WHERE highway IS NOT NULL
+#>   '
+#> from data source `/home/chris/.local/share/R/osmextract/geofabrik_scotland-latest.gpkg' 
+#>   using driver `GPKG'
+#> Simple feature collection with 61973 features and 10 fields
+#> Geometry type: LINESTRING
+#> Dimension:     XY
+#> Bounding box:  xmin: -3.490315 ymin: 55.79268 xmax: -3.055897 ymax: 56.02276
+#> Geodetic CRS:  WGS 84
+roads <- osm$network
+buildings <- osm$buildings
 ```
 
-<img src="man/figures/README-sourcedata-1.png" alt="" width="100%" />
+``` r
+plot(dem, main = "Elevation")
+plot(edinburgh, col = NA, border = "red", add = TRUE)
+```
+
+<img src="man/figures/README-sourcedataplot-1.png" alt="" width="100%" />
+
+``` r
+plot(roads, main = "Roads")
+```
+
+<img src="man/figures/README-sourcedataplot-2.png" alt="" width="100%" />
+
+``` r
+plot(buildings, main = "Buildings")
+```
+
+<img src="man/figures/README-sourcedataplot-3.png" alt="" width="100%" />
 
 ## Built environment
 
@@ -62,8 +120,6 @@ value of *off_road_travel*. Defaults set both values so that walking
 speeds are determined purely by the slope and Tobler’s hiking function.
 
 ``` r
-template <- rast(edinburgh, res = 10)
-
 built_environment <- get_built_environment(buildings = buildings,
                                            roads = roads,
                                            template = template)
@@ -75,13 +131,13 @@ built_environment_off_road_adjustment <- get_built_environment(
                                            road_travel = 1,
                                            non_road_travel = 2)
 
-plot(built_environment, maxcell = 1000000)
+plot(built_environment, maxcell = 1000000, main = "Built Environment")
 ```
 
 <img src="man/figures/README-built_environment-1.png" alt="" width="100%" />
 
 ``` r
-plot(built_environment_off_road_adjustment, maxcell = 1000000)
+plot(built_environment_off_road_adjustment, maxcell = 1000000, main = "Built environment, with faster walking speeds on roads")
 ```
 
 <img src="man/figures/README-built_environment-2.png" alt="" width="100%" />
@@ -96,7 +152,7 @@ it is 2.5km. The landscape is divided into regular squares of
 ``` r
 gridsize <- 5000
 grid <- make_grid(edinburgh, gridsize)
-plot(grid)
+plot(grid, main = "Computation grid")
 plot(edinburgh, add= TRUE)
 ```
 
@@ -125,13 +181,13 @@ bluespace <- get_target_multisource(bluespace_sources, template)
 greenspace_source <- vect("./inst/extdata/greenspace.shp") # gets os greenspace data
 greenspace <- get_target_onesource(greenspace_source, edinburgh, template)
 
-plot(bluespace)
+plot(bluespace, main = "Blue space")
 ```
 
 <img src="man/figures/README-targets-1.png" alt="" width="100%" />
 
 ``` r
-plot(greenspace)
+plot(greenspace, main = "Green space")
 ```
 
 <img src="man/figures/README-targets-2.png" alt="" width="100%" />
@@ -154,7 +210,7 @@ friction_grid <- lapply(FUN = get_friction,
                         dem = dem)
 
 fg <- mosaic(sprc(friction_grid), fun = "mean")
-plot(trim(fg))
+plot(trim(fg), main = "Friction grid")
 ```
 
 <img src="man/figures/README-friction-1.png" alt="" width="100%" />
@@ -185,13 +241,13 @@ greenspace_travel_grid <- lapply(target = greenspace, X = friction_grid, FUN = g
 
 bstt <- mosaic(sprc(bluespace_travel_grid), fun = "min")
 gstt <- mosaic(sprc(greenspace_travel_grid), fun = "min")
-plot(trim(bstt), range = c(0,900))
+plot(trim(bstt), range = c(0,900), main = "Travel time to blue spaces")
 ```
 
 <img src="man/figures/README-travel-1.png" alt="" width="100%" />
 
 ``` r
-plot(trim(gstt), range = c(0,900))
+plot(trim(gstt), range = c(0,900), main = "Travel time to green spaces")
 ```
 
 <img src="man/figures/README-travel-2.png" alt="" width="100%" />
