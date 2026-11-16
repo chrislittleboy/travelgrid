@@ -48,7 +48,7 @@ template <- rast(edinburgh, res = 15)
 dem <- get_dem(edinburgh, template)
 #> Mosaicing & Projecting
 #> Note: Elevation units are in meters.
-osm <- get_osm(system.file("extdata", "edinburgh.shp", package = "travelgrid"))
+osm <- get_osm(system.file("extdata", "edinburgh.shp", package = "travelgrid"), amenity = c("hospital", "clinic"))
 #> The input place was matched with Scotland.
 #> The chosen file was already detected in the download directory. Skip downloading.
 #> Starting with the vectortranslate operations on the input file!
@@ -86,28 +86,48 @@ osm <- get_osm(system.file("extdata", "edinburgh.shp", package = "travelgrid"))
 #> Dimension:     XY
 #> Bounding box:  xmin: -3.490315 ymin: 55.79268 xmax: -3.055897 ymax: 56.02276
 #> Geodetic CRS:  WGS 84
+#> Starting with the vectortranslate operations on the input file!
+#> 0...10...20...30...40...50...60...70...80...90...100 - done.
+#> Finished the vectortranslate operations on the input file!
+#> Reading query `SELECT *
+#>        FROM points
+#>        WHERE other_tags LIKE '%"amenity"=>"hospital"%' OR other_tags LIKE '%"amenity"=>"clinic"%''
+#> from data source `/home/chris/.local/share/R/osmextract/geofabrik_scotland-latest.gpkg' 
+#>   using driver `GPKG'
+#> Simple feature collection with 52 features and 10 fields
+#> Geometry type: POINT
+#> Dimension:     XY
+#> Bounding box:  xmin: -3.319955 ymin: 55.89321 xmax: -3.110969 ymax: 55.98041
+#> Geodetic CRS:  WGS 84
 roads <- osm$network
 buildings <- osm$buildings
+health <- osm$amenity
 ```
 
 ``` r
 plot(dem, main = "Elevation")
-plot(edinburgh, col = NA, border = "red", add = TRUE)
 ```
 
 <img src="man/figures/README-sourcedataplot-1.png" alt="" width="100%" />
 
 ``` r
-plot(roads, main = "Roads")
+plot(edinburgh, col = NA, border = "orange")
 ```
 
 <img src="man/figures/README-sourcedataplot-2.png" alt="" width="100%" />
 
 ``` r
-plot(buildings, main = "Buildings")
+plot(roads, main = "Roads")
 ```
 
 <img src="man/figures/README-sourcedataplot-3.png" alt="" width="100%" />
+
+``` r
+plot(buildings, main = "Buildings")
+plot(health,col = "pink", add = TRUE)
+```
+
+<img src="man/figures/README-sourcedataplot-4.png" alt="" width="100%" />
 
 ## Built environment
 
@@ -154,8 +174,10 @@ it is 2.5km. The landscape is divided into regular squares of
 2.5km<sup>2</sup>, each given a unique *id*.
 
 ``` r
+wd <- tempdir()
 gridsize <- 5000
 grid <- make_grid(edinburgh, gridsize)
+writeVector(grid, filename = paste0(wd, "/grid.shp"), overwrite = TRUE)
 plot(grid, main = "Computation grid")
 plot(edinburgh, add= TRUE)
 ```
@@ -185,6 +207,8 @@ bluespace <- get_target_multisource(bluespace_sources, template)
 greenspace_source <- vect("./inst/extdata/greenspace.shp") # gets os greenspace data
 greenspace <- get_target_onesource(greenspace_source, template)
 
+amenity <- get_target_amenity(osm, template)
+
 plot(bluespace, main = "Blue space")
 ```
 
@@ -206,10 +230,8 @@ adjusted based on the built environment.
 
 ``` r
 
-wd <- tempdir()
-writeVector(grid, paste0(wd, "/grid.shp"), overwrite = TRUE)
-writeRaster(built_environment, paste0(wd, "/be.tif"), overwrite = TRUE)
-writeRaster(dem, paste0(wd, "/dem.tif"), overwrite = TRUE)
+writeRaster(built_environment, filename = paste0(wd, "/be.tif"), overwrite = TRUE)
+writeRaster(dem, filename = paste0(wd, "/dem.tif"), overwrite = TRUE)
 
 friction_grid <- lapply(FUN = get_friction,
                         X = 1:nrow(grid),
@@ -249,36 +271,45 @@ where targets are sparse, and precision for long travel times is
 important, users should define a larger grid size.
 
 ``` r
-
+wd <- tempdir()
+writeRaster(friction_with_buildings, file.path(wd, "frbu.tif"), overwrite = TRUE)
 writeRaster(bluespace, file.path(wd, "bs.tif"), overwrite = TRUE)
-writeRaster(greenspace, file.path(wd, "gs.tif"), overwrite = TRUE)
-writeRaster(friction_with_buildings, file.path(wd, "fb.tif"), overwrite = TRUE)
-list.files(wd)
-#>  [1] "be.tif"                "bs.tif"                "dem.tif"              
-#>  [4] "fb.tif"                "file1c0d911bc7579.tif" "file1c0d913abc43f.tif"
-#>  [7] "file1c0d91cc73b5.tif"  "file1c0d9390529f5.tif" "file1c0d94218c664.tif"
-#> [10] "file1c0d943199fd.tif"  "file1c0d946bf3a1d.tif" "file1c0d957c50ab8.tif"
-#> [13] "file1c0d95dc5dfa7.tif" "file1c0d9676e0a54.tif" "file1c0d96cad028e.tif"
-#> [16] "friction.tif"          "frictiontiles"         "frictiontiles_built"  
-#> [19] "grid.cpg"              "grid.dbf"              "grid.prj"             
-#> [22] "grid.shp"              "grid.shx"              "gs.tif"
 bluespace_travel_grid <- get_travel_time(
   target_file = file.path(wd, "bs.tif"), 
-  friction_file =  file.path(wd, "fb.tif"))
-greenspace_travel_grid <- get_travel_time(
-  target_file = file.path(wd, "gs.tif"), 
-  friction_file = file.path(wd, "fb.tif"))
-
+  friction_file =  file.path(wd, "frbu.tif"),
+  return_rast = TRUE)
 plot(bluespace_travel_grid, range = c(0,900), main = "Travel time to blue spaces")
 ```
 
 <img src="man/figures/README-travel-1.png" alt="" width="100%" />
 
 ``` r
+writeRaster(greenspace, file.path(wd, "gs.tif"), overwrite = TRUE)
+writeRaster(friction_with_buildings, file.path(wd, "frbu.tif"), overwrite = TRUE)
+greenspace_travel_grid <- get_travel_time(
+  target_file = file.path(wd, "gs.tif"), 
+  friction_file = file.path(wd, "frbu.tif"),
+  return_rast = TRUE)
 plot(greenspace_travel_grid, range = c(0,900), main = "Travel time to green spaces")
 ```
 
 <img src="man/figures/README-travel-2.png" alt="" width="100%" />
+
+``` r
+
+writeRaster(amenity, filename = file.path(wd, "am.tif"), overwrite = TRUE)
+writeRaster(friction_with_buildings, file.path(wd, "frbu.tif"), overwrite = TRUE)
+
+amenity_travel_grid <- get_travel_time(
+  target_file = file.path(wd, "am.tif"),
+  friction_file = file.path(wd, "frbu.tif"),
+  return_rast = TRUE
+)
+
+plot(amenity_travel_grid, range = c(0,1800), main = "Travel time to hospital or health centre")
+```
+
+<img src="man/figures/README-travel-3.png" alt="" width="100%" />
 
 ## Usability
 

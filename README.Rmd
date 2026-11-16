@@ -101,8 +101,10 @@ A *gridsize* is defined, here it is 2.5km.
 The landscape is divided into regular squares of 2.5km^2^, each given a unique *id*.
 
 ```{r grid}
+wd <- tempdir()
 gridsize <- 5000
 grid <- make_grid(edinburgh, gridsize)
+writeVector(grid, filename = paste0(wd, "/grid.shp"), overwrite = TRUE)
 plot(grid, main = "Computation grid")
 plot(edinburgh, add= TRUE)
 ```
@@ -141,9 +143,8 @@ These speeds are adjusted based on the built environment.
 
 ```{r friction}
 
-writeVector(grid, paste0(wd, "/grid.shp"), overwrite = TRUE)
-writeRaster(built_environment, paste0(wd, "/be.tif"), overwrite = TRUE)
-writeRaster(dem, paste0(wd, "/dem.tif"), overwrite = TRUE)
+writeRaster(built_environment, filename = paste0(wd, "/be.tif"), overwrite = TRUE)
+writeRaster(dem, filename = paste0(wd, "/dem.tif"), overwrite = TRUE)
 
 friction_grid <- lapply(FUN = get_friction,
                         X = 1:nrow(grid),
@@ -179,6 +180,7 @@ For problems where targets are sparse, and precision for long travel times is im
 
 ```{r travel}
 wd <- tempdir()
+writeRaster(friction_with_buildings, file.path(wd, "frbu.tif"), overwrite = TRUE)
 writeRaster(bluespace, file.path(wd, "bs.tif"), overwrite = TRUE)
 bluespace_travel_grid <- get_travel_time(
   target_file = file.path(wd, "bs.tif"), 
