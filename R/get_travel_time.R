@@ -4,7 +4,7 @@
 #'   travel time is calculated.
 #' @param friction_file Path to a raster readable by rast() representing the travel cost or
 #'   friction of each cell.#'
-#' @return A [`terra::SpatRaster`] containing the accumulated least-cost travel
+#' @return Writes a GeoTIFF into the a specified directory for the accumulated least-cost travel
 #'   cost from the target cells.
 #' @export
 get_travel_time <- function(target_file, friction_file, dir = NULL){
