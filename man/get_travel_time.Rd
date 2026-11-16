@@ -5,13 +5,13 @@
 \title{Calculates the travel time from target cells across a friction
 surface using \code{terra::costDist()}.}
 \usage{
-get_travel_time(target, friction)
+get_travel_time(target_file, friction_file, dir = NULL)
 }
 \arguments{
-\item{target}{A \code{\link[terra:SpatRaster]{terra::SpatRaster}} defining the target cells from which
+\item{target_file}{Path to a raster readable by rast() defining the target cells from which
 travel time is calculated.}
 
-\item{friction}{A \code{\link[terra:SpatRaster]{terra::SpatRaster}} representing the travel cost or
+\item{friction_file}{Path to a raster readable by rast() representing the travel cost or
 friction of each cell.#'}
 }
 \value{

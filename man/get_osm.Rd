@@ -2,9 +2,9 @@
 % Please edit documentation in R/get_osm.R
 \name{get_osm}
 \alias{get_osm}
-\title{Extract OSM buildings and highways for an area}
+\title{Extract OSM buildings, highways and health facilities for an area}
 \usage{
-get_osm(filename_area, osm = NULL)
+get_osm(filename_area, osm = NULL, amenity = NULL)
 }
 \arguments{
 \item{filename_area}{Path to an area-of-interest vector file. The file is
@@ -18,12 +18,14 @@ is useful for testing or when the required extract has already been
 downloaded.}
 }
 \value{
-A list with two elements:
+A list with three elements:
 \describe{
 \item{buildings}{A \link[terra:SpatVector]{terra::SpatVector} containing OSM building
 footprints within the area of interest.}
 \item{network}{A \link[terra:SpatVector]{terra::SpatVector} containing OSM features tagged with
 \code{highway} within the area of interest.}
+\item{health}{A \link[terra:SpatVector]{terra::SpatVector} containing OSM health facilities
+within the area of interest.}
 }
 }
 \description{

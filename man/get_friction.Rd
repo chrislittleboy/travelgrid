@@ -8,18 +8,17 @@ per metre, incorporating walking speed from slope and adjustments for the
 built environment. and can optionally be written to disk as a GeoTIFF.}
 \usage{
 get_friction(
-  grid,
+  grid_file,
   id,
   gridsize,
   resolution,
-  dem,
-  built_environment,
-  todisk = FALSE,
+  dem_file,
+  built_environment_file,
   dir = NULL
 )
 }
 \arguments{
-\item{grid}{A \code{\link[terra:SpatVector]{terra::SpatVector}} containing the analysis grid and an
+\item{grid_file}{a path to a shp file with an analysis grid and an
 \code{id} attribute.}
 
 \item{id}{The identifier of the grid cell for which friction is calculated.}
@@ -29,14 +28,12 @@ get_friction(
 \item{resolution}{The spatial resolution of the friction raster in map
 units.}
 
-\item{dem}{A \code{\link[terra:SpatRaster]{terra::SpatRaster}} containing elevation data.}
-
-\item{built_environment}{A \code{\link[terra:SpatRaster]{terra::SpatRaster}} containing built-environment
-friction values.}
-
-\item{todisk}{Logical; whether to write the friction surface to disk.}
+\item{dem_file}{A filepath to a .tif containing elevation data.}
 
 \item{dir}{Character; directory in which to write friction surfaces.}
+
+\item{built_environment}{A filepath to a .tif containing built-environment
+friction values.}
 }
 \value{
 A \code{\link[terra:SpatRaster]{terra::SpatRaster}} containing the friction surface for the

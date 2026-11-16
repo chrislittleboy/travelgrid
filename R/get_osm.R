@@ -1,4 +1,4 @@
-#' Extract OSM buildings and highways for an area
+#' Extract OSM buildings, highways and health facilities for an area
 #'
 #' Downloads an OpenStreetMap PBF extract appropriate for the supplied area,
 #' or uses an existing PBF file if supplied.
@@ -12,20 +12,22 @@
 #'   is useful for testing or when the required extract has already been
 #'   downloaded.
 #'
-#' @return A list with two elements:
-#' \describe{
-#'   \item{buildings}{A [terra::SpatVector] containing OSM building
-#'   footprints within the area of interest.}
-#'   \item{network}{A [terra::SpatVector] containing OSM features tagged with
-#'   `highway` within the area of interest.}
-#' }
+#' @return A list with three elements:
+#'   \describe{
+#'     \item{buildings}{A [terra::SpatVector] containing OSM building
+#'     footprints within the area of interest.}
+#'     \item{network}{A [terra::SpatVector] containing OSM features tagged with
+#'     `highway` within the area of interest.}
+#'     \item{health}{A [terra::SpatVector] containing OSM health facilities
+#'     within the area of interest.}
+#'   }
 #'
 #' @importFrom sf read_sf
 #' @export
 
-get_osm <- function(filename_area, osm = NULL){
+get_osm <- function(filename_area, osm = NULL, amenity = NULL){
 
-  aoi <- sf::read_sf(filename_area)
+  aoi <- sf::read_sf(filename_area) |> st_transform(st_crs(4326)$wkt) |> st_union()
 
   if(is.null(osm)){
     osmdetails <- osmextract::oe_match(aoi)
@@ -38,6 +40,8 @@ get_osm <- function(filename_area, osm = NULL){
     boundary = aoi,
     query = "SELECT * FROM multipolygons WHERE building IS NOT NULL"
   )
+  buildings_aoi <- vect(buildings_aoi)
+
   network_aoi <- osmextract::oe_read(
     osm,
     layer = "lines",
@@ -48,7 +52,27 @@ get_osm <- function(filename_area, osm = NULL){
     WHERE highway IS NOT NULL
   "
   )
-  buildings_aoi <- vect(buildings_aoi)
   network_aoi <- vect(network_aoi)
+
+  if(!is.null(amenity)){
+    amenity_query <- paste0(
+      "other_tags LIKE '%\"amenity\"=>\"",
+      amenity,
+      "\"%'"
+    )
+    amenity_query <- paste(amenity_query, collapse = " OR ")
+    amenity_query
+    amenity_aoi <- osmextract::oe_read(
+    osm,
+    layer = "points",
+    boundary = aoi,
+    query = paste0(
+      "SELECT *
+       FROM points
+       WHERE ", amenity_query
+    ))
+  amenity_aoi <- vect(amenity_aoi)
+  return(list(buildings = buildings_aoi, network = network_aoi, amenity = amenity_aoi))
+  }
   return(list(buildings = buildings_aoi, network = network_aoi))
 }

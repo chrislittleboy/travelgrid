@@ -4,12 +4,10 @@
 \alias{get_target_onesource}
 \title{Transforms a target shapefile into raster format.}
 \usage{
-get_target_onesource(target, area, template)
+get_target_onesource(target, template)
 }
 \arguments{
 \item{target}{A \code{\link[terra:SpatVector]{terra::SpatVector}} defining where people are travelling to.}
-
-\item{area}{A \code{\link[terra:SpatVector]{terra::SpatVector}} defining the area of analysis.}
 
 \item{template}{A \code{\link[terra:SpatRaster]{terra::SpatRaster}} providing the extent, resolution,
 and coordinate reference system for the output raster.}

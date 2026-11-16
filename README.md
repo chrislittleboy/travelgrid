@@ -209,11 +209,19 @@ friction_grid <- lapply(FUN = get_friction,
                         built_environment = built_environment,
                         dem = dem)
 
-fg <- mosaic(sprc(friction_grid), fun = "mean")
-plot(trim(fg), main = "Friction grid")
+friction <- trim(mosaic(sprc(friction_grid), fun = "mean"))
+plot(trim(friction), main = "Friction")
 ```
 
 <img src="man/figures/README-friction-1.png" alt="" width="100%" />
+
+``` r
+
+friction_with_buildings <- get_building_friction(built_environment, friction)
+plot(trim(friction_with_buildings), main = "Friction with buildings")
+```
+
+<img src="man/figures/README-friction-2.png" alt="" width="100%" />
 
 ## Travel times
 

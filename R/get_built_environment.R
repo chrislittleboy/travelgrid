@@ -20,8 +20,12 @@
 #'
 #' @export
 
-get_built_environment <- function(buildings, roads, template, road_travel = 1, non_road_travel = 1){
-  if(crs(buildings) != crs(template)){
+get_built_environment <- function(buildings,
+                                  roads,
+                                  template,
+                                  road_travel = 1,
+                                  non_road_travel = 1){
+  if(crs(buildings) != crs(template)) {
     buildings <- project(buildings, template)}
   if(crs(roads) != crs(template)){
     roads <- project(roads, template)}

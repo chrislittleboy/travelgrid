@@ -5,10 +5,10 @@
 #' [terra::costDist()], where buildings should be strongly discouraged as
 #' travel routes but should not necessarily be completely impassable.
 #'
-#' @param built_environment A `SpatRaster` identifying the built environment.
+#' @param built_environment_file A filepath to a .tif for the built environment.
 #'   Building cells must have `NA` values and non-building cells must have
 #'   non-`NA` values.
-#' @param friction A `SpatRaster` containing the existing friction values.
+#' @param friction_file A filepath to a .tif containing the existing friction values.
 #'   The building friction is combined with this raster using the cell-wise
 #'   maximum.
 #' @param constant Numeric multiplier controlling the magnitude of the
@@ -40,8 +40,12 @@
 #' @seealso [terra::costDist()], [terra::distance()]
 #'
 #' @export
-get_building_friction <- function(built_environment, friction,
-                                  constant = 3.6, distance_weighted = TRUE) {
+get_building_friction <- function(built_environment_file, friction_file,
+                                  constant = 3.6, distance_weighted = TRUE,
+                                  dir = NULL) {
+  built_environment <- rast(built_environment_file)
+  friction <- rast(friction_file)
+  built_environment <- crop(built_environment, friction)
   if (distance_weighted == TRUE) {
     r <- distance(built_environment)
     r <- r / mean(res(r))
@@ -56,5 +60,6 @@ get_building_friction <- function(built_environment, friction,
   friction_including_buildings <- app(c(r, friction), "max", na.rm = TRUE)
   mi <- minmax(friction)[1]
   friction_including_buildings[friction_including_buildings == 0] <- mi
-  return(friction_including_buildings)
-}
+  if(is.null(dir)){dir <- tempdir()}
+  writeRaster(friction_including_buildings, filename = paste0(dir, "/frictiontiles_built/t",basename(friction_file)), overwrite = TRUE)
+  }
