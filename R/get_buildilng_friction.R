@@ -16,6 +16,7 @@
 #' @param distance_weighted Logical; if `TRUE`, friction increases with
 #'   distance into a building. If `FALSE`, all building cells receive the
 #'   same friction. Defaults to `TRUE`.
+#' @param dir a working directory.
 #'
 #' @return Writes a GeoTIFF into a newly created directory, frictiontiles_built.
 #' 

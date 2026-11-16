@@ -30,14 +30,13 @@ units.}
 
 \item{dem_file}{A filepath to a .tif containing elevation data.}
 
-\item{dir}{Character; directory in which to write friction surfaces.}
-
-\item{built_environment}{A filepath to a .tif containing built-environment
+\item{built_environment_file}{A filepath to a .tif containing built-environment
 friction values.}
+
+\item{dir}{Character; directory in which to write friction surfaces.}
 }
 \value{
-A \code{\link[terra:SpatRaster]{terra::SpatRaster}} containing the friction surface for the
-specified grid cell.
+Writes a GeoTIFF into a newly created directory, frictiontiles.
 }
 \description{
 Creates a friction surface for a grid cell using elevation, slope, and

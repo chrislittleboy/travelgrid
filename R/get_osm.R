@@ -11,7 +11,8 @@
 #'   downloaded using [osmextract::oe_download()]. Supplying an existing PBF
 #'   is useful for testing or when the required extract has already been
 #'   downloaded.
-#'
+#' @param amenity a string, used to parse and extract relevant itemsfrom OSM points.
+#' If NULL, no amenities are extracted and the returned object will have lenght 2.
 #' @return A list with three elements:
 #'   \describe{
 #'     \item{buildings}{A [terra::SpatVector] containing OSM building

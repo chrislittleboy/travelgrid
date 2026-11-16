@@ -13,9 +13,11 @@ travel time is calculated.}
 
 \item{friction_file}{Path to a raster readable by rast() representing the travel cost or
 friction of each cell.#'}
+
+\item{dir}{a working directory.}
 }
 \value{
-A \code{\link[terra:SpatRaster]{terra::SpatRaster}} containing the accumulated least-cost travel
+Writes a GeoTIFF into the a specified directory for the accumulated least-cost travel
 cost from the target cells.
 }
 \description{

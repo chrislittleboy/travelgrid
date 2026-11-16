@@ -16,6 +16,9 @@ an appropriate PBF is identified using \code{\link[osmextract:oe_match]{osmextra
 downloaded using \code{\link[osmextract:oe_download]{osmextract::oe_download()}}. Supplying an existing PBF
 is useful for testing or when the required extract has already been
 downloaded.}
+
+\item{amenity}{a string, used to parse and extract relevant itemsfrom OSM points.
+If NULL, no amenities are extracted and the returned object will have lenght 2.}
 }
 \value{
 A list with three elements:
@@ -24,7 +27,8 @@ A list with three elements:
 footprints within the area of interest.}
 \item{network}{A \link[terra:SpatVector]{terra::SpatVector} containing OSM features tagged with
 \code{highway} within the area of interest.}
-\item{health}{A \link[terra:SpatVector]{terra::SpatVector} containing OSM health facilities
+\item{amenity}{A \link[terra:SpatVector]{terra::SpatVector} containing an amenity (i.e. health facilities)
+extracted from OSM data.
 within the area of interest.}
 }
 }

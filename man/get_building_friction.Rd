@@ -28,15 +28,15 @@ Tobler walking speed on steep terrain.}
 \item{distance_weighted}{Logical; if \code{TRUE}, friction increases with
 distance into a building. If \code{FALSE}, all building cells receive the
 same friction. Defaults to \code{TRUE}.}
+
+\item{dir}{a working directory.}
 }
 \value{
-A \code{SpatRaster} containing the original friction values together
-with friction values assigned to building cells.
+Writes a GeoTIFF into a newly created directory, frictiontiles_built.
 }
 \description{
 Assigns friction values to building cells and combines these with an
-existing friction raster. Building friction is intended for use with
-\code{\link[terra:costDist]{terra::costDist()}}, where buildings should be strongly discouraged as
+existing friction raster. Buildings should be strongly discouraged as
 travel routes but should not necessarily be completely impassable.
 }
 \details{
@@ -53,7 +53,9 @@ value of \code{constant}.
 The resulting building friction is resampled to the resolution and extent
 of \code{friction} and combined with the existing friction using the cell-wise
 maximum. This allows buildings to act as high-friction areas in
-\code{\link[terra:costDist]{terra::costDist()}} without making them completely impassable.
+\code{\link[terra:costDist]{terra::costDist()}} without making them completely impassable. This is important
+to help costDist converge where some origins cells are enclosed within buildings
+without any targets.
 }
 \seealso{
 \code{\link[terra:costDist]{terra::costDist()}}, \code{\link[terra:distance]{terra::distance()}}

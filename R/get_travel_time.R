@@ -4,6 +4,7 @@
 #'   travel time is calculated.
 #' @param friction_file Path to a raster readable by rast() representing the travel cost or
 #'   friction of each cell.#'
+#' @param dir a working directory.
 #' @return Writes a GeoTIFF into the a specified directory for the accumulated least-cost travel
 #'   cost from the target cells.
 #' @export
@@ -17,7 +18,7 @@ get_travel_time <- function(target_file, friction_file, dir = NULL){
   tt <- costDist(tf, -1)
   if(is.null(dir)){dir <- tempdir()}
   writeRaster(tt,
-              file = paste0(
+              filename = paste0(
                 dir, "/", basename(friction_file)),
              overwrite = TRUE)
 }
