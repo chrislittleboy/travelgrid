@@ -7,6 +7,7 @@
 
 <!-- badges: start -->
 
+[![R-CMD-check](https://github.com/chrislittleboy/travelgrid/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/chrislittleboy/travelgrid/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
 The goal of travelgrid is to measure the time taken to travel somewhere
@@ -41,7 +42,7 @@ be downloaded using the *elevatr* package.
 ``` r
 library(travelgrid)
 library(terra)
-#> terra 1.9.46
+#> terra 1.9.50
 edinburgh <- retrieve_edinburgh()
 template <- rast(edinburgh, res = 15)
 dem <- get_dem(edinburgh, template)
@@ -52,6 +53,9 @@ osm <- get_osm(system.file("extdata", "edinburgh.shp", package = "travelgrid"))
 #> The chosen file was already detected in the download directory. Skip downloading.
 #> Starting with the vectortranslate operations on the input file!
 #> 0...10...20...30...40...50...60...70...80...90...100 - done.
+#> Warning in CPL_gdalvectortranslate(source, destination, options, oo, doo, :
+#> GDAL Message 1: Non closed ring detected. To avoid accepting it, set the
+#> OGR_GEOMETRY_ACCEPT_UNCLOSED_RING configuration option to NO
 #> Warning in CPL_gdalvectortranslate(source, destination, options, oo, doo, :
 #> GDAL Message 1: Non closed ring detected. To avoid accepting it, set the
 #> OGR_GEOMETRY_ACCEPT_UNCLOSED_RING configuration option to NO
@@ -179,7 +183,7 @@ bluespace_sources <- bluespace_sources[which(tools::file_ext(bluespace_sources) 
 bluespace <- get_target_multisource(bluespace_sources, template)
 
 greenspace_source <- vect("./inst/extdata/greenspace.shp") # gets os greenspace data
-greenspace <- get_target_onesource(greenspace_source, edinburgh, template)
+greenspace <- get_target_onesource(greenspace_source, template)
 
 plot(bluespace, main = "Blue space")
 ```
@@ -201,27 +205,34 @@ seconds it takes to travel 1 meter, based on the slope. These speeds are
 adjusted based on the built environment.
 
 ``` r
+
+wd <- tempdir()
+writeVector(grid, paste0(wd, "/grid.shp"), overwrite = TRUE)
+writeRaster(built_environment, paste0(wd, "/be.tif"), overwrite = TRUE)
+writeRaster(dem, paste0(wd, "/dem.tif"), overwrite = TRUE)
+
 friction_grid <- lapply(FUN = get_friction,
                         X = 1:nrow(grid),
-                        grid = grid,
+                        grid_file = paste0(wd, "/grid.shp"),
                         gridsize = gridsize,
                         resolution = xres(template),
-                        built_environment = built_environment,
-                        dem = dem)
+                        built_environment_file = paste0(wd, "/be.tif"),
+                        dem_file = paste0(wd, "/dem.tif"),
+                        dir = wd)
 
-friction <- trim(mosaic(sprc(friction_grid), fun = "mean"))
-plot(trim(friction), main = "Friction")
-```
+friction <- trim(mosaic(sprc(list.files(file.path(wd, "frictiontiles"), full.names = TRUE))))
+built_environment <- resample(built_environment, friction)
+writeRaster(friction, file.path(wd, "friction.tif"), overwrite = TRUE)
+writeRaster(built_environment, file.path(wd, "be.tif"), overwrite = TRUE)
 
-<img src="man/figures/README-friction-1.png" alt="" width="100%" />
-
-``` r
-
-friction_with_buildings <- get_building_friction(built_environment, friction)
+friction_with_buildings <- get_building_friction(
+  built_environment_file = file.path(wd, "be.tif"),
+  friction_file = file.path(wd, "friction.tif")
+)
 plot(trim(friction_with_buildings), main = "Friction with buildings")
 ```
 
-<img src="man/figures/README-friction-2.png" alt="" width="100%" />
+<img src="man/figures/README-friction-1.png" alt="" width="100%" />
 
 ## Travel times
 
@@ -238,24 +249,33 @@ where targets are sparse, and precision for long travel times is
 important, users should define a larger grid size.
 
 ``` r
-bluespace_travel_grid <- lapply(target = bluespace, X = friction_grid, FUN = get_travel_time)
-greenspace_travel_grid <- lapply(target = greenspace, X = friction_grid, FUN = get_travel_time)
-#> Warning: [costDist] no target cells found
-#> Warning: [costDist] no target cells found
-#> Warning: [costDist] no target cells found
-#> Warning: [costDist] no target cells found
-#> Warning: [costDist] no target cells found
-#> Warning: [costDist] no target cells found
 
-bstt <- mosaic(sprc(bluespace_travel_grid), fun = "min")
-gstt <- mosaic(sprc(greenspace_travel_grid), fun = "min")
-plot(trim(bstt), range = c(0,900), main = "Travel time to blue spaces")
+writeRaster(bluespace, file.path(wd, "bs.tif"), overwrite = TRUE)
+writeRaster(greenspace, file.path(wd, "gs.tif"), overwrite = TRUE)
+writeRaster(friction_with_buildings, file.path(wd, "fb.tif"), overwrite = TRUE)
+list.files(wd)
+#>  [1] "be.tif"                "bs.tif"                "dem.tif"              
+#>  [4] "fb.tif"                "file1c0d911bc7579.tif" "file1c0d913abc43f.tif"
+#>  [7] "file1c0d91cc73b5.tif"  "file1c0d9390529f5.tif" "file1c0d94218c664.tif"
+#> [10] "file1c0d943199fd.tif"  "file1c0d946bf3a1d.tif" "file1c0d957c50ab8.tif"
+#> [13] "file1c0d95dc5dfa7.tif" "file1c0d9676e0a54.tif" "file1c0d96cad028e.tif"
+#> [16] "friction.tif"          "frictiontiles"         "frictiontiles_built"  
+#> [19] "grid.cpg"              "grid.dbf"              "grid.prj"             
+#> [22] "grid.shp"              "grid.shx"              "gs.tif"
+bluespace_travel_grid <- get_travel_time(
+  target_file = file.path(wd, "bs.tif"), 
+  friction_file =  file.path(wd, "fb.tif"))
+greenspace_travel_grid <- get_travel_time(
+  target_file = file.path(wd, "gs.tif"), 
+  friction_file = file.path(wd, "fb.tif"))
+
+plot(bluespace_travel_grid, range = c(0,900), main = "Travel time to blue spaces")
 ```
 
 <img src="man/figures/README-travel-1.png" alt="" width="100%" />
 
 ``` r
-plot(trim(gstt), range = c(0,900), main = "Travel time to green spaces")
+plot(greenspace_travel_grid, range = c(0,900), main = "Travel time to green spaces")
 ```
 
 <img src="man/figures/README-travel-2.png" alt="" width="100%" />

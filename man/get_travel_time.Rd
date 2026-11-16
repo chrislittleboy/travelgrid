@@ -5,7 +5,7 @@
 \title{Calculates the travel time from target cells across a friction
 surface using \code{terra::costDist()}.}
 \usage{
-get_travel_time(target_file, friction_file, dir = NULL)
+get_travel_time(target_file, friction_file, dir = NULL, return_rast = FALSE)
 }
 \arguments{
 \item{target_file}{Path to a raster readable by rast() defining the target cells from which
@@ -15,6 +15,8 @@ travel time is calculated.}
 friction of each cell.#'}
 
 \item{dir}{a working directory.}
+
+\item{return_rast}{Controls whether to return a rast object from the function or not.}
 }
 \value{
 Writes a GeoTIFF into the a specified directory for the accumulated least-cost travel

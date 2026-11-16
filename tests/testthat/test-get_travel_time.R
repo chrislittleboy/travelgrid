@@ -8,7 +8,8 @@ friction <- rast(system.file("extdata", "friction.tif", package = "travelgrid"))
 
 tt <- get_travel_time(
   target_file = file.path(wd, "gs.tif"),
-  friction_file = system.file("extdata", "friction.tif", package = "travelgrid")
+  friction_file = system.file("extdata", "friction.tif", package = "travelgrid"),
+  return_rast = TRUE
   )
 
 test_that("Returns a SpatRast", {

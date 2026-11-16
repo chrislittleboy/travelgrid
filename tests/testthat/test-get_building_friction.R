@@ -38,10 +38,10 @@ suppressWarnings(building_friction <- get_building_friction(
   friction_file = file.path(wd, "friction.tif")
 ))
 
-building_friction_constant <- get_building_friction(
+suppressWarnings(building_friction_constant <- get_building_friction(
   built_environment_file = file.path(wd, "be.tif"),
   friction_file = file.path(wd, "friction.tif"),
-  distance_weighted = FALSE)
+  distance_weighted = FALSE))
 
 building_friction_constant[] <- round(building_friction_constant, digits = 1)
 
