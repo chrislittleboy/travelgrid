@@ -18,11 +18,11 @@
 #'     footprints within the area of interest.}
 #'     \item{network}{A [terra::SpatVector] containing OSM features tagged with
 #'     `highway` within the area of interest.}
-#'     \item{health}{A [terra::SpatVector] containing OSM health facilities
+#'     \item{amenity}{A [terra::SpatVector] containing an amenity (i.e. health facilities)
+#' extracted from OSM data.
 #'     within the area of interest.}
 #'   }
 #'
-#' @importFrom sf read_sf
 #' @export
 
 get_osm <- function(filename_area, osm = NULL, amenity = NULL){

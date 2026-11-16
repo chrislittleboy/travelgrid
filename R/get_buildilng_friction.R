@@ -1,8 +1,7 @@
 #' Add friction to building cells
 #'
 #' Assigns friction values to building cells and combines these with an
-#' existing friction raster. Building friction is intended for use with
-#' [terra::costDist()], where buildings should be strongly discouraged as
+#' existing friction raster. Buildings should be strongly discouraged as
 #' travel routes but should not necessarily be completely impassable.
 #'
 #' @param built_environment_file A filepath to a .tif for the built environment.
@@ -18,9 +17,8 @@
 #'   distance into a building. If `FALSE`, all building cells receive the
 #'   same friction. Defaults to `TRUE`.
 #'
-#' @return A `SpatRaster` containing the original friction values together
-#'   with friction values assigned to building cells.
-#'
+#' @return Writes a GeoTIFF into a newly created directory, frictiontiles_built.
+#' 
 #' @details
 #' When `distance_weighted = TRUE`, [terra::distance()] is used to calculate
 #' the distance of each cell to the nearest non-building cell. Distances are
@@ -35,7 +33,9 @@
 #' The resulting building friction is resampled to the resolution and extent
 #' of `friction` and combined with the existing friction using the cell-wise
 #' maximum. This allows buildings to act as high-friction areas in
-#' [terra::costDist()] without making them completely impassable.
+#' [terra::costDist()] without making them completely impassable. This is important
+#' to help costDist converge where some origins cells are enclosed within buildings
+#' without any targets.
 #'
 #' @seealso [terra::costDist()], [terra::distance()]
 #'

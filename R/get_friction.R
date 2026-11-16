@@ -10,11 +10,11 @@
 #' @param resolution The spatial resolution of the friction raster in map
 #'   units.
 #' @param dem_file A filepath to a .tif containing elevation data.
-#' @param built_environment A filepath to a .tif containing built-environment
+#' @param built_environment_file A filepath to a .tif containing built-environment
 #'   friction values.
 #' @param dir Character; directory in which to write friction surfaces.
-#' @return A [`terra::SpatRaster`] containing the friction surface for the
-#'   specified grid cell.
+#' @return Writes a GeoTIFF into a newly created directory, frictiontiles.
+
 #' @export
 
 get_friction <- function(

@@ -12,7 +12,7 @@ writeRaster(built_environment, paste0(wd, "/be.tif"), overwrite = TRUE)
 writeRaster(dem, paste0(wd, "/dem.tif"), overwrite = TRUE)
 
 friction_grid <- lapply(FUN = get_friction,
-                        X = sample(1:nrow(grid), 5),
+                        X = 1:nrow(grid),
                         grid_file = paste0(wd, "/grid.shp"),
                         gridsize = gridsize,
                         resolution = xres(template),
