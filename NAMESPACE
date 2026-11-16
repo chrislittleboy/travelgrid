@@ -24,6 +24,7 @@ importFrom(sf,
   read_sf,
   st_as_sf,
   st_convex_hull,
+  st_transform,
   st_union,
   write_sf
 )

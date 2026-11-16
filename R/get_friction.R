@@ -48,6 +48,7 @@ get_friction <- function(
 
   friction <- friction * built_environment # accounts for walking routes via paths/roads and avoiding buildings
   if(is.null(dir)){dir <- tempdir()}
+  dir.create(file.path(dir, "frictiontiles"), showWarnings = FALSE)
   writeRaster(friction, filename = paste0(dir, "/frictiontiles/t",id, ".tif"), overwrite = TRUE)
 }
 

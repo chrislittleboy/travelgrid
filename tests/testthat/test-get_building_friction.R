@@ -12,30 +12,37 @@ built_environment <- get_built_environment(buildings, roads, template, non_road_
 dem <- built_environment
 dem[] <- sample(x = 1:100, size = length(built_environment[]), replace = TRUE)
 gridsize <- 500
-aoi <- vect(aoi) |> set.crs("epsg:3857")
+aoi <- aoi |> vect() |> set.crs("epsg:3857")
 grid <- make_grid(aoi, gridsize)
+wd <- tempdir()
+writeVector(grid, paste0(wd, "/grid.shp"), overwrite = TRUE)
+writeRaster(built_environment, paste0(wd, "/be.tif"), overwrite = TRUE)
+writeRaster(dem, paste0(wd, "/dem.tif"), overwrite = TRUE)
 
 friction_grid <- lapply(FUN = get_friction,
                         X = 1:nrow(grid),
-                        grid = grid,
+                        grid_file = paste0(wd, "/grid.shp"),
                         gridsize = gridsize,
                         resolution = xres(template),
-                        built_environment = built_environment,
-                        dem = dem)
+                        built_environment_file = paste0(wd, "/be.tif"),
+                        dem_file = paste0(wd, "/dem.tif"),
+                        dir = wd)
 
-friction <- trim(mosaic(sprc(friction_grid)))
-res(friction) <- rep(round(res(friction)[[1]]),2)
+friction <- trim(mosaic(sprc(list.files(file.path(wd, "frictiontiles"), full.names = TRUE))))
 built_environment <- resample(built_environment, friction)
+writeRaster(friction, file.path(wd, "friction.tif"), overwrite = TRUE)
+writeRaster(built_environment, file.path(wd, "be.tif"), overwrite = TRUE)
 
-building_friction <- get_building_friction(
-  built_environment,
-  friction
-)
+suppressWarnings(building_friction <- get_building_friction(
+  built_environment_file = file.path(wd, "be.tif"),
+  friction_file = file.path(wd, "friction.tif")
+))
+
 building_friction_constant <- get_building_friction(
-  built_environment,
-  friction,
-  distance_weighted = FALSE
-)
+  built_environment_file = file.path(wd, "be.tif"),
+  friction_file = file.path(wd, "friction.tif"),
+  distance_weighted = FALSE)
+
 building_friction_constant[] <- round(building_friction_constant, digits = 1)
 
 test_that("Building friction returns a SpatRaster", {
@@ -61,3 +68,4 @@ test_that("Building friction is greater than the underlying friction", {
     max(values(building_friction), na.rm = TRUE) > 1
   )
 })
+

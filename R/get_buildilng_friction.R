@@ -61,5 +61,6 @@ get_building_friction <- function(built_environment_file, friction_file,
   mi <- minmax(friction)[1]
   friction_including_buildings[friction_including_buildings == 0] <- mi
   if(is.null(dir)){dir <- tempdir()}
+  dir.create(file.path(dir, "frictiontiles_built"), showWarnings = FALSE)
   writeRaster(friction_including_buildings, filename = paste0(dir, "/frictiontiles_built/t",basename(friction_file)), overwrite = TRUE)
   }
