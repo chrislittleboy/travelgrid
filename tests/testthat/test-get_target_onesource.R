@@ -1,7 +1,9 @@
 greenspace_source <- vect(system.file("extdata", "greenspace.shp", package = "travelgrid")) # gets os greenspace data
 edinburgh <- retrieve_edinburgh()
 template <- rast(edinburgh, res = 100)
-greenspace <- get_target_onesource(greenspace_source, edinburgh, template)
+
+greenspace <- get_target_onesource(greenspace_source, template)
+
 x <- sort(unique(values(greenspace)))
 test_that("Returns a SpatRast", {
   expect_s4_class(greenspace, "SpatRaster")
