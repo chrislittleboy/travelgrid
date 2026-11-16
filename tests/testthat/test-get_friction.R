@@ -6,16 +6,21 @@ dem <- retrieve_dem()
 gridsize <- 5000
 grid <- make_grid(edinburgh, gridsize)
 built_environment <- get_built_environment(buildings, roads, template, non_road_travel = 2)
+wd <- tempdir()
+writeVector(grid, paste0(wd, "/grid.shp"), overwrite = TRUE)
+writeRaster(built_environment, paste0(wd, "/be.tif"), overwrite = TRUE)
+writeRaster(dem, paste0(wd, "/dem.tif"), overwrite = TRUE)
 
 friction_grid <- lapply(FUN = get_friction,
                         X = sample(1:nrow(grid), 5),
-                        grid = grid,
+                        grid_file = paste0(wd, "/grid.shp"),
                         gridsize = gridsize,
                         resolution = xres(template),
-                        built_environment = built_environment,
-                        dem = dem)
+                        built_environment_file = paste0(wd, "/be.tif"),
+                        dem_file = paste0(wd, "/dem.tif"),
+                        dir = wd)
 
-friction <- trim(merge(sprc(friction_grid)))
+friction <- trim(mosaic(sprc(list.files(file.path(wd, "frictiontiles"), full.names = TRUE))))
 
 mm <- as.numeric(minmax(friction))
 
