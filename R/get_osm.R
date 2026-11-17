@@ -28,7 +28,9 @@
 
 get_osm <- function(filename_area, osm = NULL, amenity = NULL){
 
-  aoi <- sf::read_sf(filename_area) |> st_transform(st_crs(4326)$wkt) |> st_union()
+  aoi <- sf::read_sf(filename_area)
+  aoi <- st_transform(aoi, st_crs(4326)$wkt)
+  aoi <- st_union(aoi)
 
   if(is.null(osm)){
     osmdetails <- osmextract::oe_match(aoi)
