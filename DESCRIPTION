@@ -1,6 +1,6 @@
 Package: travelgrid
 Type: Package
-Title: Measures the travel time across a landscape
+Title: Measures the Travel Time Across a Landscape
 Version: 0.0.1
 Date: 2026-09-01
 Authors@R: person("Chris", "Littleboy", role = c("aut", "cre"), email = "chris.littleboy@stir.ac.uk")

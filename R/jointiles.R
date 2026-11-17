@@ -23,24 +23,29 @@
 #' Also writes a text file listing the input rasters to
 #' `./filelists/<outputname>.txt`.
 #'
-#' Requires GDAL and the `gdalbuildvrt` command-line utility to be available
-#' on the system path.
 #'
 #' @export
 jointiles <- function(inputdir, outputname, resolution, pixelf){
   f <- list.files(inputdir, full.names = TRUE)
+  dir.create("filelists", showWarnings = FALSE)
+  dir.create("vrt", showWarnings = FALSE)
   writeLines(f, paste0("./filelists/", outputname, ".txt"))
   vrt_file <- file.path("./vrt", paste0(outputname, ".vrt"))
+
   args <- c(
-    "-overwrite",
     "-resolution", "user",
     "-tr", resolution, resolution,
     "-tap",
-    "-pixel-function", pixelf,
-    "-input_file_list", paste0("./filelists/", outputname, ".txt"),
-    vrt_file
+    "-pixel-function", pixelf
   )
-  result <- system2("gdalbuildvrt", args = args)
+
+  result <- gdal_utils(
+    util = "buildvrt",
+    source = f,
+    destination = vrt_file,
+    options = args
+  )
+
   output <- rast(vrt_file)
   writeRaster(output, paste0("./out/", outputname, ".tif"))
 }

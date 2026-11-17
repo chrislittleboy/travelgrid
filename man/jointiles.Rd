@@ -34,7 +34,4 @@ input pixels are combined.
 
 Also writes a text file listing the input rasters to
 \verb{./filelists/<outputname>.txt}.
-
-Requires GDAL and the \code{gdalbuildvrt} command-line utility to be available
-on the system path.
 }
